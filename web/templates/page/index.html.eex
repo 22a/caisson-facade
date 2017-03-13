@@ -1,0 +1,19 @@
+<h4 class="center">
+  <div>
+    The form below lets you run arbitrary code on my server. Please try and break it. Only a handful of languages are supported right now but you should be able to do enough damage with bash. When manage to destroy everything, it'd be great if you let me know what you did. <a href="https://github.com/22a/caisson/blob/master/bin/execute.sh" target="_blank">Here</a>'s probably a good place to start poking holes.
+  </div>
+</h4>
+
+<%= form_for @conn, page_path(@conn, :execute), [as: :payload, id: "payload-form"], fn f -> %>
+  <div class="center">
+    <%= select f, :lang, ["python","c","bash"], class: "btn btn-lg btn-info slim-text" %>
+  </div>
+  <div class="center">
+    <%= textarea f, :code, class: "code-box" %>
+  </div>
+  <div class="center">
+    <%= submit "Execute", class: "btn btn-lg btn-success slim-text" %>
+  </div>
+<% end %>
+
+<textarea id="output-display" class="output" disabled></textarea>
