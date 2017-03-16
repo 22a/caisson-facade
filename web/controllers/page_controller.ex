@@ -48,12 +48,12 @@ defmodule Facade.PageController do
           output: output,
           start_time: start_time}}
 
-      {:ok, %HTTPoison.Response{status_code: 500, body: body}} ->
+      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
         {:error, %{
           conn: conn,
           code: code,
           lang: lang,
-          status: :caisson_error,
+          status: {:caisson_error, status_code},
           body: body,
           start_time: start_time
         }}
@@ -97,14 +97,14 @@ defmodule Facade.PageController do
     HTTPoison.post("#{@form_url}#{param_string}", "")
     {:error, %{conn: conn, status: :invalid_params}}
   end
-  defp log_to_spreadsheet({:error, %{ conn: conn, code: code, lang: lang, status: :caisson_error, body: body, start_time: start_time }}) do
+  defp log_to_spreadsheet({:error, %{ conn: conn, code: code, lang: lang, status: {:caisson_error, status_code}, body: body, start_time: start_time }}) do
     end_time = :os.system_time(:milli_seconds)
     duration = end_time - start_time
     params = %{
       "entry.265888225" => lang |> String.slice(0..20),
       "entry.1653135443" => code |> String.slice(0..400),
       "entry.1225368034" => duration,
-      "entry.754653002" => "Caisson Error",
+      "entry.754653002" => "Caisson Error #{status_code}",
       "entry.1773633405" => body |> to_string |> String.slice(0..400),
       "entry.379903819" => to_string(:inet_parse.ntoa(conn.remote_ip))
     }
