@@ -11,8 +11,9 @@
 //
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
-import "babel-polyfill"
 import "phoenix_html"
+import "babel-polyfill"
+import "whatwg-fetch"
 
 // Import local files
 //
@@ -26,7 +27,9 @@ import "phoenix_html"
 document.getElementById('payload-form').addEventListener('submit', e => {
   e.preventDefault()
   execute.bind(e.target)()
-});
+})
+
+const codeTextArea = document.getElementById('payload_code')
 
 async function execute() {
   try {
@@ -34,26 +37,24 @@ async function execute() {
       method: 'POST',
       body: new FormData(this),
       credentials: 'same-origin'
-    });
+    })
 
-    console.log(response)
     if (response.ok) {
-      renderOutput(JSON.parse(await response.json()))
+      renderOutput(await response.json())
     } else {
       renderError(await response.json())
     }
   } catch (err) {
     console.log(err)
   }
-  this.reset()
+  codeTextArea.value=''
 }
 
 const outputTextArea = document.getElementById('output-display');
 
 const renderOutput = json => {
-  outputTextArea.innerHTML = json.output;
-  console.log(json.exit_status);
+  outputTextArea.innerHTML = json.output
 }
-const renderError = bleugh => {
-  outputTextArea.innerHTML = bleugh;
+const renderError = json => {
+  outputTextArea.innerHTML = json.error
 }
